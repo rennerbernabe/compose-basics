@@ -3,6 +3,9 @@ package com.rbb.composebasics
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -59,8 +62,7 @@ fun MyApp(modifier: Modifier = Modifier) {
 
 @Composable
 fun OnboardingScreen(
-    onContinueClicked: () -> Unit,
-    modifier: Modifier = Modifier
+    onContinueClicked: () -> Unit, modifier: Modifier = Modifier
 ) {
 
     Column(
@@ -70,8 +72,7 @@ fun OnboardingScreen(
     ) {
         Text("Welcome to the Basics Codelab!")
         Button(
-            modifier = Modifier.padding(vertical = 24.dp),
-            onClick = onContinueClicked
+            modifier = Modifier.padding(vertical = 24.dp), onClick = onContinueClicked
         ) {
             Text("Continue")
         }
@@ -79,7 +80,7 @@ fun OnboardingScreen(
 }
 
 @Composable
-fun Greetings(modifier: Modifier = Modifier, names: List<String> = List(1000) { "$it" } ) {
+fun Greetings(modifier: Modifier = Modifier, names: List<String> = List(1000) { "$it" }) {
     LazyColumn(modifier = modifier.padding(vertical = 4.dp)) {
         items(items = names) { name ->
             Greeting(name = name)
@@ -90,7 +91,14 @@ fun Greetings(modifier: Modifier = Modifier, names: List<String> = List(1000) { 
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
     var expanded by rememberSaveable { mutableStateOf(false) }
-    val extraPadding = if (expanded) 48.dp else 0.dp
+    val extraPadding by animateDpAsState(
+        if (expanded) 48.dp else 0.dp,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        ),
+        label = ""
+    )
 
     Surface(
         color = MaterialTheme.colorScheme.primary,
@@ -106,9 +114,7 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
                 Text(text = "Hello")
                 Text(text = name)
             }
-            ElevatedButton(
-                onClick = { expanded = !expanded }
-            ) {
+            ElevatedButton(onClick = { expanded = !expanded }) {
                 Text(if (expanded) "Show less" else "Show more")
             }
         }
